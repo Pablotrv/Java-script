@@ -7,9 +7,15 @@
     <style>
       body {
         font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      main {
         display: flex;
         justify-content: space-around;
-        padding: 20px;
       }
       #tienda,
       #resumen-carrito {
@@ -20,7 +26,8 @@
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
       h1,
-      h2 {
+      h2,
+      h3 {
         color: #333;
       }
       .producto {
@@ -71,19 +78,25 @@
     </style>
   </head>
   <body>
-    <section id="tienda">
-      <h1>Nuestros Productos</h1>
-      <div id="productos-container"></div>
-    </section>
+    <header>
+      <h1>¡Bienvenido a la Tienda de Productos Gamer!</h1>
+    </header>
 
-    <section id="resumen-carrito">
-      <h1>Carrito de Compras</h1>
-      <ul id="carrito-items"></ul>
-      <div id="total-container">
-        Total: $<span id="total-compra">0.00</span>
-      </div>
-      <button id="btn-pagar">Finalizar Compra</button>
-    </section>
+    <main>
+      <section id="tienda">
+        <h2>Nuestros Productos</h2>
+        <div id="productos-container"></div>
+      </section>
+
+      <section id="resumen-carrito">
+        <h2>Carrito de Compras</h2>
+        <ul id="carrito-items"></ul>
+        <div id="total-container">
+          Total: $<span id="total-compra">0.00</span>
+        </div>
+        <button id="btn-pagar">Finalizar Compra</button>
+      </section>
+    </main>
 
     <script src="main.js"></script>
   </body>
