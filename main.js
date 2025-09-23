@@ -1,9 +1,11 @@
 // --- Estado de la Aplicación ---
 const productos = [
-  { id: 1, nombre: "Laptop Gamer", precio: 1500 },
-  { id: 2, nombre: "Mouse Óptico", precio: 25 },
-  { id: 3, nombre: "Teclado Mecánico", precio: 120 },
-  { id: 4, nombre: 'Monitor 27"', precio: 350 },
+  { id: 1, nombre: "Laptop Gamer Asus ROG", precio: 1500 },
+  { id: 2, nombre: "Mouse Óptico Logitech G502", precio: 25 },
+  { id: 3, nombre: "Teclado Mecánico Corsair K95", precio: 120 },
+  { id: 4, nombre: 'Monitor 27" Dell UltraSharp', precio: 350 },
+  { id: 5, nombre: "Placa de Video TUF Gaming 3090", precio: 1300 },
+  { id: 6, nombre: "Auriculares Corsair Void Elite", precio: 300 },
 ];
 
 let carrito = [];
