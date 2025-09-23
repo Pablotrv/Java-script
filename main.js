@@ -1,77 +1,111 @@
-// --- Función Principal para Iniciar la Compra ---
-function iniciarCompra() {
-  // --- Declaración de Constantes y Variables ---
-  const productos = [
-    { id: 1, nombre: "Laptop Gamer", precio: 1500 },
-    { id: 2, nombre: "Mouse Óptico", precio: 25 },
-    { id: 3, nombre: "Teclado Mecánico", precio: 120 },
-    { id: 4, nombre: 'Monitor 27"', precio: 350 },
-  ];
+// --- Estado de la Aplicación ---
+const productos = [
+  { id: 1, nombre: "Laptop Gamer", precio: 1500 },
+  { id: 2, nombre: "Mouse Óptico", precio: 25 },
+  { id: 3, nombre: "Teclado Mecánico", precio: 120 },
+  { id: 4, nombre: 'Monitor 27"', precio: 350 },
+];
 
-  let carrito = [];
-  let totalCompra = 0;
-  let seguirComprando = true;
+let carrito = [];
 
-  // --- Ciclo Principal de Compra ---
-  while (seguirComprando) {
-    let mensaje = "¿Qué producto deseas agregar al carrito?\n";
-    productos.forEach((producto) => {
-      mensaje += `${producto.id}. ${producto.nombre} - $${producto.precio}\n`;
-    });
-    mensaje += 'Escribe "pagar" para finalizar tu compra.';
+// --- Selectores del DOM ---
+const productosContainer = document.getElementById("productos-container");
+const carritoItemsContainer = document.getElementById("carrito-items");
+const totalCompraSpan = document.getElementById("total-compra");
+const btnPagar = document.getElementById("btn-pagar");
 
-    const seleccion = prompt(mensaje);
+// --- Funciones ---
 
-    switch (seleccion) {
-      case "1":
-      case "2":
-      case "3":
-      case "4":
-        const productoElegido = productos.find(
-          (p) => p.id === parseInt(seleccion)
-        );
-        const cantidad = parseInt(
-          prompt(
-            `Has elegido: ${productoElegido.nombre}.\n¿Cuántas unidades quieres?`
-          )
-        );
+/**
+ * Renderiza los productos en el contenedor de productos.
+ */
+function renderizarProductos() {
+  productos.forEach((producto) => {
+    const productoDiv = document.createElement("div");
+    productoDiv.classList.add("producto");
 
-        if (cantidad > 0) {
-          carrito.push({ producto: productoElegido, cantidad: cantidad });
-          totalCompra += productoElegido.precio * cantidad;
-          alert(
-            `${cantidad} unidad(es) de ${productoElegido.nombre} se ha(n) agregado al carrito.`
-          );
-        } else {
-          alert("La cantidad debe ser un número mayor a cero.");
-        }
-        break;
+    productoDiv.innerHTML = `
+      <div class="producto-info">
+        <span>${producto.nombre}</span>
+        <span>- $${producto.precio.toFixed(2)}</span>
+      </div>
+      <button class="btn-agregar" data-id="${producto.id}">Agregar</button>
+    `;
 
-      case "pagar":
-        seguirComprando = false;
-        break;
-
-      default:
-        alert(
-          'Opción no válida. Por favor, elige un número de la lista o escribe "pagar".'
-        );
-        break;
-    }
-  }
-
-  // --- Resumen de la Compra ---
-  if (carrito.length > 0) {
-    let resumen = "Resumen de tu compra:\n\n";
-    carrito.forEach((item) => {
-      const subtotal = item.producto.precio * item.cantidad;
-      resumen += `${item.cantidad} x ${item.producto.nombre} - Subtotal: $${subtotal}\n`;
-    });
-    resumen += `\nTotal a pagar: $${totalCompra}`;
-    alert(resumen);
-  } else {
-    alert("No has agregado ningún producto al carrito. ¡Vuelve pronto!");
-  }
-
-  alert("¡Gracias por tu compra!");
+    productosContainer.appendChild(productoDiv);
+  });
 }
-iniciarCompra();
+
+/**
+ * Agrega un producto al carrito o incrementa su cantidad si ya existe.
+ * @param {number} productoId - El ID del producto a agregar.
+ */
+function agregarAlCarrito(productoId) {
+  const productoElegido = productos.find((p) => p.id === productoId);
+  const itemEnCarrito = carrito.find((item) => item.producto.id === productoId);
+
+  if (itemEnCarrito) {
+    itemEnCarrito.cantidad++;
+  } else {
+    carrito.push({ producto: productoElegido, cantidad: 1 });
+  }
+
+  renderizarCarrito();
+}
+
+/**
+ * Renderiza los items del carrito y actualiza el total.
+ */
+function renderizarCarrito() {
+  carritoItemsContainer.innerHTML = ""; // Limpiar el carrito antes de renderizar
+  let totalCompra = 0;
+
+  if (carrito.length === 0) {
+    carritoItemsContainer.innerHTML = "<li>El carrito está vacío.</li>";
+  } else {
+    carrito.forEach((item) => {
+      const li = document.createElement("li");
+      const subtotal = item.producto.precio * item.cantidad;
+      li.textContent = `${item.cantidad} x ${
+        item.producto.nombre
+      } - Subtotal: $${subtotal.toFixed(2)}`;
+      carritoItemsContainer.appendChild(li);
+      totalCompra += subtotal;
+    });
+  }
+
+  totalCompraSpan.textContent = totalCompra.toFixed(2);
+}
+
+/**
+ * Finaliza la compra, muestra un resumen y reinicia el estado.
+ */
+function finalizarCompra() {
+  if (carrito.length === 0) {
+    alert("No has agregado ningún producto al carrito. ¡Agrega algo primero!");
+    return;
+  }
+
+  alert(
+    `¡Gracias por tu compra! Total a pagar: $${totalCompraSpan.textContent}`
+  );
+
+  // Reiniciar el estado
+  carrito = [];
+  renderizarCarrito();
+}
+
+// --- Inicialización y Event Listeners ---
+document.addEventListener("DOMContentLoaded", () => {
+  renderizarProductos();
+  renderizarCarrito();
+
+  productosContainer.addEventListener("click", (e) => {
+    if (e.target.classList.contains("btn-agregar")) {
+      const productoId = parseInt(e.target.getAttribute("data-id"));
+      agregarAlCarrito(productoId);
+    }
+  });
+
+  btnPagar.addEventListener("click", finalizarCompra);
+});

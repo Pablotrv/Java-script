@@ -3,9 +3,88 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Entrega1 - Pablo Trovato</title>
+    <title>Tienda Online</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: space-around;
+        padding: 20px;
+      }
+      #tienda,
+      #resumen-carrito {
+        width: 45%;
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      h1,
+      h2 {
+        color: #333;
+      }
+      .producto {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        padding: 10px 0;
+      }
+      .producto:last-child {
+        border-bottom: none;
+      }
+      .producto-info {
+        flex-grow: 1;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      #carrito-items li {
+        list-style-type: none;
+        margin-bottom: 10px;
+      }
+      #total-container {
+        text-align: right;
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-top: 20px;
+      }
+      #btn-pagar {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1em;
+        margin-top: 10px;
+        background-color: #28a745;
+      }
+      #btn-pagar:hover {
+        background-color: #218838;
+      }
+    </style>
   </head>
   <body>
-    <script type="module" src="./main.js"></script>
+    <section id="tienda">
+      <h1>Nuestros Productos</h1>
+      <div id="productos-container"></div>
+    </section>
+
+    <section id="resumen-carrito">
+      <h1>Carrito de Compras</h1>
+      <ul id="carrito-items"></ul>
+      <div id="total-container">
+        Total: $<span id="total-compra">0.00</span>
+      </div>
+      <button id="btn-pagar">Finalizar Compra</button>
+    </section>
+
+    <script src="main.js"></script>
   </body>
 </html>
