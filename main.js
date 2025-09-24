@@ -1,12 +1,17 @@
 (function () {
   // --- Estado de la Aplicación ---
   const productos = [
-    { id: 1, nombre: "Laptop Gamer", precio: 1500 },
-    { id: 2, nombre: "Mouse Óptico", precio: 25 },
-    { id: 3, nombre: "Teclado Mecánico", precio: 120 },
-    { id: 4, nombre: 'Monitor 27"', precio: 350 },
+    { id: 1, nombre: "Laptop Gamer Asus ROG", precio: 1500 },
+    { id: 2, nombre: "Mouse Óptico Logitech G502", precio: 25 },
+    { id: 3, nombre: "Teclado Mecánico Corsair K95", precio: 120 },
+    { id: 4, nombre: 'Monitor 27" Dell', precio: 350 },
     { id: 5, nombre: "Placa de Video TUF Gaming 3090", precio: 1300 },
     { id: 6, nombre: "Auriculares Corsair Void Elite", precio: 300 },
+    { id: 7, nombre: "Mouse Gamer Corsair Harpoon", precio: 300 },
+    { id: 8, nombre: "Disco Sólido SSD 1TB Lexar", precio: 200 },
+    { id: 9, nombre: "Memoria RAM 16GB DDR5", precio: 80 },
+    { id: 10, nombre: "Fuente de Poder ROG Strix 1000W", precio: 100 },
+    { id: 11, nombre: "Gabinete NZXT H510", precio: 90 },
   ];
 
   let carrito = [];
