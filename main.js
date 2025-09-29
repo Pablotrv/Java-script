@@ -1,19 +1,6 @@
 (function () {
   // --- Estado de la Aplicación ---
-  const productos = [
-    { id: 1, nombre: "Laptop Gamer Asus ROG", precio: 1500 },
-    { id: 2, nombre: "Mouse Óptico Logitech G502", precio: 25 },
-    { id: 3, nombre: "Teclado Mecánico Corsair K95", precio: 120 },
-    { id: 4, nombre: 'Monitor 27" Dell', precio: 350 },
-    { id: 5, nombre: "Placa de Video TUF Gaming 3090", precio: 1300 },
-    { id: 6, nombre: "Auriculares Corsair Void Elite", precio: 300 },
-    { id: 7, nombre: "Mouse Gamer Corsair Harpoon", precio: 300 },
-    { id: 8, nombre: "Disco Sólido SSD 1TB Lexar", precio: 200 },
-    { id: 9, nombre: "Memoria RAM 16GB DDR5", precio: 80 },
-    { id: 10, nombre: "Fuente de Poder ROG Strix 1000W", precio: 100 },
-    { id: 11, nombre: "Gabinete NZXT H510", precio: 90 },
-  ];
-
+  let productos = [];
   let carrito = [];
 
   // --- Selectores del DOM ---
@@ -28,16 +15,26 @@
    * Renderiza los productos en el contenedor de productos.
    */
   function renderizarProductos() {
+    productosContainer.innerHTML = ""; // Limpiar para re-renderizar
     productos.forEach((producto) => {
       const productoDiv = document.createElement("div");
       productoDiv.classList.add("producto");
 
+      if (producto.stock === 0) {
+        productoDiv.classList.add("sin-stock");
+      }
+
+      const botonAgregar =
+        producto.stock > 0
+          ? `<button class="btn-agregar" data-id="${producto.id}">Agregar</button>`
+          : `<button class="btn-agregar" disabled>Sin stock</button>`;
+
       productoDiv.innerHTML = `
       <div class="producto-info">
-        <span>${producto.nombre}</span>
+        <span>${producto.nombre} (Stock: ${producto.stock})</span>
         <span>- $${producto.precio.toFixed(2)}</span>
       </div>
-      <button class="btn-agregar" data-id="${producto.id}">Agregar</button>
+      ${botonAgregar}
     `;
 
       productosContainer.appendChild(productoDiv);
@@ -49,19 +46,29 @@
    * @param {number} productoId - El ID del producto a agregar.
    */
   function agregarAlCarrito(productoId) {
-    const productoElegido = productos.find((p) => p.id === productoId);
-    const itemEnCarrito = carrito.find(
-      (item) => item.producto.id === productoId
-    );
+    const productoEnStock = productos.find((p) => p.id === productoId);
 
-    if (itemEnCarrito) {
-      itemEnCarrito.cantidad++;
-    } else {
-      carrito.push({ producto: productoElegido, cantidad: 1 });
+    if (productoEnStock && productoEnStock.stock > 0) {
+      const itemEnCarrito = carrito.find(
+        (item) => item.producto.id === productoId
+      );
+
+      if (itemEnCarrito) {
+        itemEnCarrito.cantidad++;
+      } else {
+        // Clonamos el producto para no modificar el original en el carrito
+        const productoParaCarrito = { ...productoEnStock };
+        delete productoParaCarrito.stock; // No es necesario en el carrito
+        carrito.push({ producto: productoParaCarrito, cantidad: 1 });
+      }
+
+      // Reducir stock y guardar
+      productoEnStock.stock--;
+      guardarProductosEnStorage();
+      renderizarProductos(); // Re-renderizar productos para actualizar stock y botón
+      renderizarCarrito();
+      guardarCarritoEnStorage();
     }
-
-    renderizarCarrito();
-    guardarCarritoEnStorage();
   }
 
   /**
@@ -104,6 +111,64 @@
       carrito = JSON.parse(carritoGuardado);
     }
   }
+
+  /**
+   * Guarda el estado de los productos (con su stock) en localStorage.
+   */
+  function guardarProductosEnStorage() {
+    localStorage.setItem("productos", JSON.stringify(productos));
+  }
+
+  /**
+   * Carga los productos desde localStorage o los inicializa si no existen.
+   */
+  function inicializarProductos() {
+    const productosGuardados = localStorage.getItem("productos");
+    if (productosGuardados) {
+      productos = JSON.parse(productosGuardados);
+    } else {
+      // Si no hay nada en storage, usamos la lista inicial y la guardamos.
+      productos = [
+        { id: 1, nombre: "Laptop Gamer Asus ROG", precio: 1500, stock: 5 },
+        { id: 2, nombre: "Mouse Óptico Logitech G502", precio: 25, stock: 20 },
+        {
+          id: 3,
+          nombre: "Teclado Mecánico Corsair K95",
+          precio: 120,
+          stock: 10,
+        },
+        { id: 4, nombre: 'Monitor 27" Dell', precio: 350, stock: 8 },
+        {
+          id: 5,
+          nombre: "Placa de Video TUF Gaming 3090",
+          precio: 1300,
+          stock: 3,
+        },
+        {
+          id: 6,
+          nombre: "Auriculares Corsair Void Elite",
+          precio: 300,
+          stock: 12,
+        },
+        {
+          id: 7,
+          nombre: "Mouse Gamer Corsair Harpoon",
+          precio: 300,
+          stock: 15,
+        },
+        { id: 8, nombre: "Disco Sólido SSD 1TB Lexar", precio: 200, stock: 18 },
+        { id: 9, nombre: "Memoria RAM 16GB DDR5", precio: 80, stock: 25 },
+        {
+          id: 10,
+          nombre: "Fuente de Poder ROG Strix 1000W",
+          precio: 100,
+          stock: 7,
+        },
+        { id: 11, nombre: "Gabinete NZXT H510", precio: 90, stock: 9 },
+      ];
+      guardarProductosEnStorage();
+    }
+  }
   /**
    * Finaliza la compra, muestra un resumen y reinicia el estado.
    */
@@ -121,11 +186,12 @@
 
     // Reiniciar el estado
     carrito = [];
-    localStorage.removeItem("carrito"); // Limpiar el storage
+    guardarCarritoEnStorage(); // Guardar el carrito vacío en storage
     renderizarCarrito();
   }
 
   // --- Inicialización y Event Listeners ---
+  inicializarProductos();
   cargarCarritoDeStorage();
   renderizarProductos();
   renderizarCarrito();

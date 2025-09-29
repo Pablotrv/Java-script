@@ -46,6 +46,16 @@ h3 {
   background-color: #f8f9fa;
 }
 
+.producto.sin-stock {
+  opacity: 0.6;
+  background-color: #e9ecef;
+}
+
+.producto.sin-stock:hover {
+  /* Evita que el producto agotado cambie de color al pasar el ratón */
+  background-color: #e9ecef;
+}
+
 .producto:last-child {
   border-bottom: none;
 }
@@ -75,6 +85,12 @@ button:hover {
 
 .btn-agregar:hover {
   background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
 }
 
 #carrito-items li {
