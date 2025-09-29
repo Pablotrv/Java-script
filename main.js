@@ -8,6 +8,9 @@
   const carritoItemsContainer = document.getElementById("carrito-items");
   const totalCompraSpan = document.getElementById("total-compra");
   const btnPagar = document.getElementById("btn-pagar");
+  const notificacionesContainer = document.getElementById(
+    "notificaciones-container"
+  );
 
   // --- Funciones ---
 
@@ -67,7 +70,10 @@
 
       // Notificar si el producto se agota
       if (productoEnStock.stock === 0) {
-        alert(`¡El producto "${productoEnStock.nombre}" se ha agotado!`);
+        mostrarNotificacion(
+          `¡El producto "${productoEnStock.nombre}" se ha agotado!`,
+          "info"
+        );
       }
 
       guardarProductosEnStorage();
@@ -180,20 +186,38 @@
    */
   function finalizarCompra() {
     if (carrito.length === 0) {
-      alert(
-        "No has agregado ningún producto al carrito. ¡Agrega algo primero!"
+      mostrarNotificacion(
+        "El carrito está vacío. ¡Agrega algo primero!",
+        "error"
       );
       return;
     }
 
-    alert(
-      `¡Gracias por tu compra! Total a pagar: $${totalCompraSpan.textContent}`
+    mostrarNotificacion(
+      `¡Gracias por tu compra! Total: $${totalCompraSpan.textContent}`,
+      "success"
     );
 
     // Reiniciar el estado
     carrito = [];
     guardarCarritoEnStorage(); // Guardar el carrito vacío en storage
     renderizarCarrito();
+  }
+
+  /**
+   * Muestra una notificación tipo "toast" en la pantalla.
+   * @param {string} mensaje - El mensaje a mostrar.
+   * @param {string} [tipo='info'] - El tipo de notificación ('info', 'success', 'error').
+   */
+  function mostrarNotificacion(mensaje, tipo = "info") {
+    const notificacionDiv = document.createElement("div");
+    notificacionDiv.classList.add("notificacion", tipo);
+    notificacionDiv.textContent = mensaje;
+
+    notificacionesContainer.appendChild(notificacionDiv);
+
+    // Eliminar la notificación después de que termine la animación
+    setTimeout(() => notificacionDiv.remove(), 4000);
   }
 
   // --- Inicialización y Event Listeners ---

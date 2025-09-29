@@ -139,3 +139,51 @@ button:disabled {
     width: 45%;
   }
 }
+
+/* --- Estilos para Notificaciones (Toast) --- */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+#notificaciones-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notificacion {
+  padding: 15px 20px;
+  border-radius: 8px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: fadeInOut 4s forwards;
+}
+
+.notificacion.info {
+  background-color: #17a2b8;
+}
+.notificacion.success {
+  background-color: #28a745;
+}
+.notificacion.error {
+  background-color: #dc3545;
+}
