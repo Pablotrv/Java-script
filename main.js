@@ -64,6 +64,12 @@
 
       // Reducir stock y guardar
       productoEnStock.stock--;
+
+      // Notificar si el producto se agota
+      if (productoEnStock.stock === 0) {
+        alert(`¡El producto "${productoEnStock.nombre}" se ha agotado!`);
+      }
+
       guardarProductosEnStorage();
       renderizarProductos(); // Re-renderizar productos para actualizar stock y botón
       renderizarCarrito();
