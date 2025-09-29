@@ -1,29 +1,31 @@
 body {
   font-family: "Nunito Sans", sans-serif;
-  padding: 20px;
+  padding: 10px;
   background-color: #f8f9fa;
   color: #212529;
+  box-sizing: border-box;
 }
 
 header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 main {
   display: flex;
-  justify-content: space-around;
-  gap: 30px;
+  flex-direction: column;
+  gap: 20px;
 }
 
 #tienda,
 #resumen-carrito {
-  width: 45%;
+  width: 100%;
   background-color: #ffffff;
   border: 1px solid #dee2e6;
-  padding: 25px;
+  padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 }
 
 h1,
@@ -117,4 +119,23 @@ button:disabled {
 
 #btn-pagar:hover {
   background-color: #218838;
+}
+
+/* --- Media Queries para Diseño Responsivo (Desktop) --- */
+@media (min-width: 800px) {
+  body {
+    padding: 20px;
+  }
+
+  main {
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 30px;
+  }
+
+  #tienda,
+  #resumen-carrito {
+    width: 45%;
+  }
 }
