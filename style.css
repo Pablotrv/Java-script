@@ -28,6 +28,17 @@ main {
   box-sizing: border-box;
 }
 
+#filtro-busqueda {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  font-size: 1em;
+  box-sizing: border-box;
+  font-family: "Nunito Sans", sans-serif;
+}
+
 h1,
 h2,
 h3 {
@@ -42,6 +53,23 @@ h3 {
   padding: 15px 5px;
   transition: background-color 0.2s ease-in-out;
   border-radius: 4px;
+  gap: 15px;
+}
+
+.producto-imagen {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  flex-shrink: 0; /* Evita que la imagen se encoja */
+}
+
+.producto-contenido {
+  flex-grow: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .producto:hover {
@@ -96,10 +124,24 @@ button:disabled {
 }
 
 #carrito-items li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   list-style-type: none;
   margin-bottom: 12px;
   padding-bottom: 12px;
   border-bottom: 1px solid #f1f3f5;
+  gap: 10px;
+}
+
+.btn-eliminar {
+  background-color: #dc3545;
+  padding: 5px 10px;
+  font-size: 0.9em;
+}
+
+.btn-eliminar:hover {
+  background-color: #c82333;
 }
 
 #total-container {
@@ -121,6 +163,12 @@ button:disabled {
   background-color: #218838;
 }
 
+#btn-pagar:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* --- Media Queries para Diseño Responsivo (Desktop) --- */
 @media (min-width: 800px) {
   body {
@@ -138,52 +186,4 @@ button:disabled {
   #resumen-carrito {
     width: 45%;
   }
-}
-
-/* --- Estilos para Notificaciones (Toast) --- */
-@keyframes fadeInOut {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  10% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  90% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-}
-
-#notificaciones-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.notificacion {
-  padding: 15px 20px;
-  border-radius: 8px;
-  color: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: fadeInOut 4s forwards;
-}
-
-.notificacion.info {
-  background-color: #17a2b8;
-}
-.notificacion.success {
-  background-color: #28a745;
-}
-.notificacion.error {
-  background-color: #dc3545;
 }
