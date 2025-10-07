@@ -628,40 +628,33 @@
     renderizarCarrito();
     actualizarUIUsuario(); // Estado inicial de UI de usuario
 
-    // Adjuntar event listeners después de inicializar los elementos
-    productosContainer.addEventListener("click", handleProductClick);
-    filtroBusquedaInput.addEventListener("input", handleSearch);
-    carritoItemsContainer.addEventListener("click", handleCartClick);
+    // --- Adjuntar Event Listeners ---
+    productosContainer.addEventListener("click", (e) => {
+      if (e.target.classList.contains("btn-agregar")) {
+        const productoId = parseInt(e.target.getAttribute("data-id"));
+        agregarAlCarrito(productoId);
+      }
+    });
+
+    filtroBusquedaInput.addEventListener("input", (e) => {
+      currentPage = 1; // Resetear a la primera página al buscar
+      const terminoBusqueda = e.target.value.toLowerCase();
+      const productosFiltrados = productos.filter((producto) =>
+        producto.nombre.toLowerCase().includes(terminoBusqueda)
+      );
+      renderizarProductos(productosFiltrados);
+    });
+
+    carritoItemsContainer.addEventListener("click", (e) => {
+      if (e.target.classList.contains("btn-eliminar")) {
+        const productoId = parseInt(e.target.getAttribute("data-id"));
+        eliminarDelCarrito(productoId);
+      }
+    });
+
     btnVaciarCarrito.addEventListener("click", vaciarCarrito);
     btnPagar.addEventListener("click", finalizarCompra);
   }
-
-  productosContainer.addEventListener("click", (e) => {
-    if (e.target.classList.contains("btn-agregar")) {
-      const productoId = parseInt(e.target.getAttribute("data-id"));
-      agregarAlCarrito(productoId);
-    }
-  });
-
-  filtroBusquedaInput.addEventListener("input", (e) => {
-    currentPage = 1; // Resetear a la primera página al buscar
-    const terminoBusqueda = e.target.value.toLowerCase();
-    const productosFiltrados = productos.filter((producto) =>
-      producto.nombre.toLowerCase().includes(terminoBusqueda)
-    );
-    renderizarProductos(productosFiltrados);
-  });
-
-  carritoItemsContainer.addEventListener("click", (e) => {
-    if (e.target.classList.contains("btn-eliminar")) {
-      const productoId = parseInt(e.target.getAttribute("data-id"));
-      eliminarDelCarrito(productoId);
-    }
-  });
-
-  btnVaciarCarrito.addEventListener("click", vaciarCarrito);
-
-  btnPagar.addEventListener("click", finalizarCompra);
 
   // Iniciar la aplicación
   inicializarApp().catch((error) => {
