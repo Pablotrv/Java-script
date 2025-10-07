@@ -5,16 +5,16 @@
   let historialCompras = [];
   let usuarioLogueado = null;
 
-  // --- Selectores del DOM (se inicializarán en inicializarApp) ---
-  let productosContainer,
-    carritoItemsContainer,
-    totalCompraSpan,
-    btnVaciarCarrito,
-    filtroBusquedaInput,
-    userSection,
-    btnPagar,
-    historialSection,
-    historialContainer;
+  // --- Selectores del DOM ---
+  const productosContainer = document.getElementById("productos-container");
+  const carritoItemsContainer = document.getElementById("carrito-items");
+  const totalCompraSpan = document.getElementById("total-compra");
+  const btnVaciarCarrito = document.getElementById("btn-vaciar-carrito");
+  const filtroBusquedaInput = document.getElementById("filtro-busqueda");
+  const userSection = document.getElementById("user-section");
+  const btnPagar = document.getElementById("btn-pagar");
+  const historialSection = document.getElementById("historial-compras");
+  const historialContainer = document.getElementById("historial-container");
 
   // --- Funciones ---
 
@@ -552,53 +552,44 @@
 
   // --- Inicialización y Event Listeners ---
   async function inicializarApp() {
-    // Inicializar selectores del DOM aquí para asegurar que el DOM esté cargado
-    productosContainer = document.getElementById("productos-container");
-    carritoItemsContainer = document.getElementById("carrito-items");
-    totalCompraSpan = document.getElementById("total-compra");
-    btnVaciarCarrito = document.getElementById("btn-vaciar-carrito");
-    filtroBusquedaInput = document.getElementById("filtro-busqueda");
-    userSection = document.getElementById("user-section");
-    btnPagar = document.getElementById("btn-pagar");
-    historialSection = document.getElementById("historial-compras");
-    historialContainer = document.getElementById("historial-container");
+    try {
+      await inicializarProductos();
+      cargarCarritoDeStorage();
+      cargarHistorialDeStorage();
+      renderizarProductos();
+      renderizarCarrito();
+      actualizarUIUsuario(); // Estado inicial de UI de usuario
 
-    await inicializarProductos();
-    cargarCarritoDeStorage();
-    cargarHistorialDeStorage();
-    renderizarProductos();
-    renderizarCarrito();
-    actualizarUIUsuario(); // Estado inicial de UI de usuario
+      productosContainer.addEventListener("click", (e) => {
+        if (e.target.classList.contains("btn-agregar")) {
+          const productoId = parseInt(e.target.getAttribute("data-id"));
+          agregarAlCarrito(productoId);
+        }
+      });
 
-    // --- Adjuntar Event Listeners ---
-    productosContainer.addEventListener("click", (e) => {
-      if (e.target.classList.contains("btn-agregar")) {
-        const productoId = parseInt(e.target.getAttribute("data-id"));
-        agregarAlCarrito(productoId);
-      }
-    });
+      filtroBusquedaInput.addEventListener("input", (e) => {
+        const terminoBusqueda = e.target.value.toLowerCase();
+        const productosFiltrados = productos.filter((producto) =>
+          producto.nombre.toLowerCase().includes(terminoBusqueda)
+        );
+        renderizarProductos(productosFiltrados);
+      });
 
-    filtroBusquedaInput.addEventListener("input", (e) => {
-      const terminoBusqueda = e.target.value.toLowerCase();
-      const productosFiltrados = productos.filter((producto) =>
-        producto.nombre.toLowerCase().includes(terminoBusqueda)
-      );
-      renderizarProductos(productosFiltrados);
-    });
+      carritoItemsContainer.addEventListener("click", (e) => {
+        if (e.target.classList.contains("btn-eliminar")) {
+          const productoId = parseInt(e.target.getAttribute("data-id"));
+          eliminarDelCarrito(productoId);
+        }
+      });
 
-    carritoItemsContainer.addEventListener("click", (e) => {
-      if (e.target.classList.contains("btn-eliminar")) {
-        const productoId = parseInt(e.target.getAttribute("data-id"));
-        eliminarDelCarrito(productoId);
-      }
-    });
+      btnVaciarCarrito.addEventListener("click", vaciarCarrito);
 
-    btnVaciarCarrito.addEventListener("click", vaciarCarrito);
-    btnPagar.addEventListener("click", finalizarCompra);
+      btnPagar.addEventListener("click", finalizarCompra);
+    } catch (error) {
+      manejarError(error, "Ocurrió un error crítico al iniciar la aplicación.");
+    }
   }
 
   // Iniciar la aplicación
-  inicializarApp().catch((error) => {
-    manejarError(error, "Ocurrió un error crítico al iniciar la aplicación.");
-  });
+  document.addEventListener("DOMContentLoaded", inicializarApp);
 })();
