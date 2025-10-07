@@ -123,6 +123,13 @@ button:disabled {
   transform: none;
 }
 
+#carrito-acciones {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
 #carrito-items li {
   display: flex;
   justify-content: space-between;
@@ -184,7 +191,11 @@ button:disabled {
 
   #tienda,
   #resumen-carrito {
-    width: 45%;
+    width: 48%;
+  }
+
+  #historial-compras {
+    width: 98%;
   }
 }
 
@@ -204,4 +215,26 @@ button:disabled {
 
 .producto-agregado-animacion {
   animation: flash-producto 0.7s ease-out;
+}
+
+/* --- Estilos para el historial --- */
+#historial-compras {
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+.compra-historial {
+  border: 1px solid #e9ecef;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.compra-historial ul {
+  padding-left: 20px;
 }

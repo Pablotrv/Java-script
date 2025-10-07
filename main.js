@@ -2,18 +2,36 @@
   // --- Estado de la Aplicación ---
   let productos = [];
   let carrito = [];
+  let historialCompras = [];
   let usuarioLogueado = null;
 
   // --- Selectores del DOM ---
   const productosContainer = document.getElementById("productos-container");
   const carritoItemsContainer = document.getElementById("carrito-items");
   const totalCompraSpan = document.getElementById("total-compra");
+  const btnVaciarCarrito = document.getElementById("btn-vaciar-carrito");
   const filtroBusquedaInput = document.getElementById("filtro-busqueda");
   const userSection = document.getElementById("user-section");
-  const btnLogin = document.getElementById("btn-login");
   const btnPagar = document.getElementById("btn-pagar");
+  const historialSection = document.getElementById("historial-compras");
+  const historialContainer = document.getElementById("historial-container");
 
   // --- Funciones ---
+
+  /**
+   * Maneja los errores de forma centralizada.
+   * Muestra un mensaje amigable al usuario y registra el error técnico en la consola.
+   * @param {Error} error - El objeto de error capturado.
+   * @param {string} mensajeUsuario - El mensaje a mostrar al usuario.
+   */
+  function manejarError(error, mensajeUsuario) {
+    console.error("Ocurrió un error:", error); // Para depuración
+    mostrarNotificacion(
+      mensajeUsuario ||
+        "Ha ocurrido un error inesperado. Por favor, intenta de nuevo.",
+      "error"
+    );
+  }
 
   /**
    * Renderiza los productos en el contenedor de productos.
@@ -93,9 +111,13 @@
    * @param {number} productoId - El ID del producto a agregar.
    */
   function agregarAlCarrito(productoId) {
-    const productoEnStock = productos.find((p) => p.id === productoId);
+    try {
+      const productoEnStock = productos.find((p) => p.id === productoId);
 
-    if (productoEnStock && productoEnStock.stock > 0) {
+      if (!productoEnStock || productoEnStock.stock <= 0) {
+        return; // No hacer nada si no hay producto o stock
+      }
+
       const itemEnCarrito = carrito.find(
         (item) => item.producto.id === productoId
       );
@@ -112,6 +134,11 @@
       // Reducir stock y guardar
       productoEnStock.stock--;
 
+      guardarProductosEnStorage();
+      actualizarVistaProducto(productoId);
+      renderizarCarrito();
+      guardarCarritoEnStorage();
+
       // Notificar si el producto se agota
       if (productoEnStock.stock === 0) {
         mostrarNotificacion(
@@ -119,11 +146,6 @@
           "warning"
         );
       }
-
-      guardarProductosEnStorage();
-      actualizarVistaProducto(productoId); // <-- OPTIMIZACIÓN: Solo actualizamos el producto afectado
-      renderizarCarrito();
-      guardarCarritoEnStorage();
 
       // Aplicar animación de "flash" al producto agregado
       const productoDiv = productosContainer.querySelector(
@@ -136,6 +158,8 @@
           productoDiv.classList.remove("producto-agregado-animacion");
         }, 700); // 700ms, igual que la duración de la animación
       }
+    } catch (error) {
+      manejarError(error, "No se pudo agregar el producto al carrito.");
     }
   }
 
@@ -147,8 +171,10 @@
     let totalCompra = 0;
 
     if (carrito.length === 0) {
+      btnVaciarCarrito.style.display = "none";
       carritoItemsContainer.innerHTML = "<li>El carrito está vacío.</li>";
     } else {
+      btnVaciarCarrito.style.display = "block";
       carrito.forEach((item) => {
         const li = document.createElement("li");
         const subtotal = item.producto.precio * item.cantidad;
@@ -175,49 +201,104 @@
    * @param {number} productoId - El ID del producto a eliminar.
    */
   function eliminarDelCarrito(productoId) {
-    const itemIndex = carrito.findIndex(
-      (item) => item.producto.id === productoId
-    );
-
-    if (itemIndex > -1) {
-      const itemEliminado = carrito[itemIndex];
-      const productoEnStock = productos.find((p) => p.id === productoId);
-
-      // Devolver el stock al producto original
-      if (productoEnStock) {
-        productoEnStock.stock += itemEliminado.cantidad;
-      }
-
-      // Eliminar el item del carrito
-      carrito.splice(itemIndex, 1);
-
-      mostrarNotificacion(
-        `"${itemEliminado.producto.nombre}" eliminado del carrito.`,
-        "error"
+    try {
+      const itemIndex = carrito.findIndex(
+        (item) => item.producto.id === productoId
       );
 
-      // Actualizar todo
-      guardarProductosEnStorage();
-      guardarCarritoEnStorage();
-      actualizarVistaProducto(productoId); // <-- OPTIMIZACIÓN
-      renderizarCarrito();
+      if (itemIndex > -1) {
+        const itemEliminado = carrito[itemIndex];
+        const productoEnStock = productos.find((p) => p.id === productoId);
+
+        // Devolver el stock al producto original
+        if (productoEnStock) {
+          productoEnStock.stock += itemEliminado.cantidad;
+        }
+
+        // Eliminar el item del carrito
+        carrito.splice(itemIndex, 1);
+
+        mostrarNotificacion(
+          `"${itemEliminado.producto.nombre}" eliminado del carrito.`,
+          "error"
+        );
+
+        // Actualizar todo
+        guardarProductosEnStorage();
+        guardarCarritoEnStorage();
+        actualizarVistaProducto(productoId);
+        renderizarCarrito();
+      }
+    } catch (error) {
+      manejarError(error, "No se pudo eliminar el producto del carrito.");
     }
   }
 
   /**
+   * Vacía completamente el carrito.
+   */
+  function vaciarCarrito() {
+    if (carrito.length === 0) return;
+
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción eliminará todos los productos de tu carrito.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, vaciar carrito",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Devolver el stock de todos los items del carrito
+        carrito.forEach((item) => {
+          const productoEnStock = productos.find(
+            (p) => p.id === item.producto.id
+          );
+          if (productoEnStock) {
+            productoEnStock.stock += item.cantidad;
+            actualizarVistaProducto(productoEnStock.id);
+          }
+        });
+
+        carrito = [];
+        guardarCarritoEnStorage();
+        guardarProductosEnStorage();
+        renderizarCarrito();
+        mostrarNotificacion("El carrito ha sido vaciado.", "info");
+      }
+    });
+  }
+  /**
    * Guarda el estado actual del carrito en localStorage.
    */
   function guardarCarritoEnStorage() {
-    localStorage.setItem("carrito", JSON.stringify(carrito));
+    try {
+      localStorage.setItem("carrito", JSON.stringify(carrito));
+    } catch (error) {
+      manejarError(
+        error,
+        "No se pudo guardar el carrito. El almacenamiento podría estar lleno."
+      );
+    }
   }
 
   /**
    * Carga el carrito desde localStorage al iniciar la página.
    */
   function cargarCarritoDeStorage() {
-    const carritoGuardado = localStorage.getItem("carrito");
-    if (carritoGuardado) {
-      carrito = JSON.parse(carritoGuardado);
+    try {
+      const carritoGuardado = localStorage.getItem("carrito");
+      if (carritoGuardado) {
+        carrito = JSON.parse(carritoGuardado);
+      }
+    } catch (error) {
+      carrito = []; // Reiniciar si hay un error
+      manejarError(
+        error,
+        "No se pudo cargar el carrito guardado. Se ha iniciado un carrito nuevo."
+      );
     }
   }
 
@@ -225,100 +306,100 @@
    * Guarda el estado de los productos (con su stock) en localStorage.
    */
   function guardarProductosEnStorage() {
-    localStorage.setItem("productos", JSON.stringify(productos));
+    try {
+      localStorage.setItem("productos", JSON.stringify(productos));
+    } catch (error) {
+      manejarError(
+        error,
+        "No se pudo guardar el estado de los productos. El almacenamiento podría estar lleno."
+      );
+    }
   }
 
   /**
-   * Carga los productos desde localStorage o los inicializa si no existen.
+   * Carga los productos desde un JSON externo o desde localStorage si ya existen.
    */
-  function inicializarProductos() {
-    const productosGuardados = localStorage.getItem("productos");
-    if (productosGuardados) {
-      productos = JSON.parse(productosGuardados);
-    } else {
-      // Si no hay nada en storage, usamos la lista inicial y la guardamos.
-      productos = [
-        {
-          id: 1,
-          nombre: "Laptop Gamer Asus ROG",
-          precio: 1500,
-          stock: 5,
-          imagen: "images/laptop.jpg",
-        },
-        {
-          id: 2,
-          nombre: "Mouse Óptico Logitech G502",
-          precio: 25,
-          stock: 20,
-          imagen: "images/mouse.jpg",
-        },
-        {
-          id: 3,
-          nombre: "Teclado Mecánico Corsair K95",
-          precio: 120,
-          stock: 10,
-          imagen: "images/teclado.jpg",
-        },
-        {
-          id: 4,
-          nombre: 'Monitor 27" Dell',
-          precio: 350,
-          stock: 8,
-          imagen: "images/monitor.jpg",
-        },
-        {
-          id: 5,
-          nombre: "Placa de Video TUF Gaming 3090",
-          precio: 1300,
-          stock: 3,
-          imagen: "images/gpu.jpg",
-        },
-        {
-          id: 6,
-          nombre: "Auriculares Corsair Void Elite",
-          precio: 300,
-          stock: 12,
-          imagen: "images/auriculares.jpg",
-        },
-        {
-          id: 7,
-          nombre: "Mouse Gamer Corsair Harpoon",
-          precio: 300,
-          stock: 15,
-          imagen: "images/mouse.jpg", // Reutilizamos imagen
-        },
-        {
-          id: 8,
-          nombre: "Disco Sólido SSD 1TB Lexar",
-          precio: 200,
-          stock: 18,
-          imagen: "images/ssd.jpg",
-        },
-        {
-          id: 9,
-          nombre: "Memoria RAM 16GB DDR5",
-          precio: 80,
-          stock: 25,
-          imagen: "images/ram.jpg",
-        },
-        {
-          id: 10,
-          nombre: "Fuente de Poder ROG Strix 1000W",
-          precio: 100,
-          stock: 7,
-          imagen: "images/psu.jpg",
-        },
-        {
-          id: 11,
-          nombre: "Gabinete NZXT H510",
-          precio: 90,
-          stock: 9,
-          imagen: "images/gabinete.jpg",
-        },
-      ];
-      guardarProductosEnStorage();
+  async function inicializarProductos() {
+    try {
+      const productosGuardados = localStorage.getItem("productos");
+      if (productosGuardados) {
+        productos = JSON.parse(productosGuardados);
+        console.log("Productos cargados desde localStorage.");
+      } else {
+        // Si no hay en localStorage, los cargamos del JSON
+        const response = await fetch("productos.json");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        productos = await response.json();
+        guardarProductosEnStorage(); // Guardamos la lista inicial en storage
+        console.log("Productos cargados desde productos.json.");
+      }
+    } catch (error) {
+      productos = []; // Dejar la lista vacía si todo falla
+      manejarError(error, "No se pudieron cargar los productos.");
     }
   }
+
+  /**
+   * Guarda el historial de compras en localStorage.
+   */
+  function guardarHistorialEnStorage() {
+    try {
+      localStorage.setItem(
+        "historialCompras",
+        JSON.stringify(historialCompras)
+      );
+    } catch (error) {
+      manejarError(error, "No se pudo guardar el historial de compras.");
+    }
+  }
+
+  /**
+   * Carga el historial de compras desde localStorage.
+   */
+  function cargarHistorialDeStorage() {
+    try {
+      const historialGuardado = localStorage.getItem("historialCompras");
+      if (historialGuardado) {
+        historialCompras = JSON.parse(historialGuardado);
+      }
+    } catch (error) {
+      historialCompras = [];
+      manejarError(error, "No se pudo cargar el historial de compras.");
+    }
+  }
+
+  /**
+   * Renderiza el historial de compras en el DOM.
+   */
+  function renderizarHistorial() {
+    historialContainer.innerHTML = "";
+    if (historialCompras.length === 0) {
+      historialContainer.innerHTML =
+        "<p>Aún no has realizado ninguna compra.</p>";
+      return;
+    }
+
+    // Mostrar las compras más recientes primero
+    [...historialCompras].reverse().forEach((compra) => {
+      const compraDiv = document.createElement("div");
+      compraDiv.className = "compra-historial";
+      const itemsHtml = compra.items
+        .map((item) => `<li>${item.cantidad} x ${item.producto.nombre}</li>`)
+        .join("");
+
+      compraDiv.innerHTML = `
+        <p><b>Fecha:</b> ${new Date(compra.fecha).toLocaleString()}</p>
+        <p><b>Total:</b> $${compra.total.toFixed(2)}</p>
+        <p><b>Método de pago:</b> ${compra.metodoPago}</p>
+        <p><b>Items:</b></p>
+        <ul>${itemsHtml}</ul>
+      `;
+      historialContainer.appendChild(compraDiv);
+    });
+  }
+
   /**
    * Finaliza la compra, muestra un resumen y reinicia el estado.
    */
@@ -362,11 +443,22 @@
       if (result.isConfirmed && result.value) {
         const metodoPago = result.value;
 
+        // Crear registro para el historial
+        const nuevaCompra = {
+          fecha: new Date().toISOString(),
+          items: [...carrito], // Copia del carrito
+          total: parseFloat(totalCompraSpan.textContent),
+          metodoPago: metodoPago,
+        };
+        historialCompras.push(nuevaCompra);
+
         // Reiniciar el estado
         carrito = [];
         guardarProductosEnStorage(); // Guardamos el nuevo stock de productos
         guardarCarritoEnStorage(); // Guardar el carrito vacío en storage
+        guardarHistorialEnStorage();
         renderizarCarrito();
+        renderizarHistorial();
 
         Swal.fire({
           title: `¡Compra realizada con ${
@@ -384,25 +476,31 @@
    * Simula el inicio de sesión de un usuario.
    */
   async function iniciarSesion() {
-    const { value: formValues } = await Swal.fire({
-      title: "Iniciar Sesión",
-      html: `
-        <input id="swal-input1" class="swal2-input" placeholder="Usuario">
-        <input id="swal-input2" type="password" class="swal2-input" placeholder="Contraseña">
-      `,
-      focusConfirm: false,
-      preConfirm: () => {
-        return [
-          document.getElementById("swal-input1").value,
-          document.getElementById("swal-input2").value,
-        ];
-      },
-    });
+    try {
+      const { value: formValues } = await Swal.fire({
+        title: "Iniciar Sesión",
+        html: `
+          <input id="swal-input1" class="swal2-input" placeholder="Usuario">
+          <input id="swal-input2" type="password" class="swal2-input" placeholder="Contraseña">
+        `,
+        focusConfirm: false,
+        preConfirm: () => {
+          return [
+            document.getElementById("swal-input1").value,
+            document.getElementById("swal-input2").value,
+          ];
+        },
+      });
 
-    if (formValues && formValues[0]) {
-      usuarioLogueado = formValues[0]; // Guardamos el nombre de usuario
-      mostrarNotificacion(`¡Bienvenido, ${usuarioLogueado}!`, "success");
-      actualizarUIUsuario();
+      if (formValues && formValues[0]) {
+        usuarioLogueado = formValues[0]; // Guardamos el nombre de usuario
+        mostrarNotificacion(`¡Bienvenido, ${usuarioLogueado}!`, "success");
+        actualizarUIUsuario();
+        renderizarHistorial(); // Mostrar historial al iniciar sesión
+        historialSection.style.display = "block";
+      }
+    } catch (error) {
+      manejarError(error, "No se pudo completar el inicio de sesión.");
     }
   }
 
@@ -412,6 +510,8 @@
   function cerrarSesion() {
     mostrarNotificacion(`¡Hasta luego, ${usuarioLogueado}!`, "info");
     usuarioLogueado = null;
+    historialSection.style.display = "none"; // Ocultar historial
+    historialContainer.innerHTML = "";
     actualizarUIUsuario();
   }
 
@@ -452,11 +552,14 @@
   }
 
   // --- Inicialización y Event Listeners ---
-  inicializarProductos();
-  cargarCarritoDeStorage();
-  renderizarProductos();
-  renderizarCarrito();
-  actualizarUIUsuario(); // Estado inicial de UI de usuario
+  async function inicializarApp() {
+    await inicializarProductos();
+    cargarCarritoDeStorage();
+    cargarHistorialDeStorage();
+    renderizarProductos();
+    renderizarCarrito();
+    actualizarUIUsuario(); // Estado inicial de UI de usuario
+  }
 
   productosContainer.addEventListener("click", (e) => {
     if (e.target.classList.contains("btn-agregar")) {
@@ -480,11 +583,12 @@
     }
   });
 
-  // Listener inicial para el botón de login/logout
-  userSection.addEventListener("click", (e) => {
-    if (e.target.id === "btn-login") iniciarSesion();
-    if (e.target.id === "btn-logout") cerrarSesion();
-  });
+  btnVaciarCarrito.addEventListener("click", vaciarCarrito);
 
   btnPagar.addEventListener("click", finalizarCompra);
+
+  // Iniciar la aplicación
+  inicializarApp().catch((error) => {
+    manejarError(error, "Ocurrió un error crítico al iniciar la aplicación.");
+  });
 })();

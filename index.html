@@ -41,10 +41,20 @@
       <section id="resumen-carrito">
         <h2>Carrito de Compras</h2>
         <ul id="carrito-items"></ul>
+        <div id="carrito-acciones">
+          <button id="btn-vaciar-carrito" class="btn-eliminar">
+            Vaciar Carrito
+          </button>
+        </div>
         <div id="total-container">
           Total: $<span id="total-compra">0.00</span>
         </div>
         <button id="btn-pagar">Finalizar Compra</button>
+      </section>
+
+      <section id="historial-compras" style="display: none">
+        <h2>Historial de Compras</h2>
+        <div id="historial-container"></div>
       </section>
     </main>
 
