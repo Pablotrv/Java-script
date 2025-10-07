@@ -4,8 +4,6 @@
   let carrito = [];
   let historialCompras = [];
   let usuarioLogueado = null;
-  let currentPage = 1;
-  const itemsPerPage = 5; // Productos a mostrar por página
 
   // --- Selectores del DOM (se inicializarán en inicializarApp) ---
   let productosContainer,
@@ -16,8 +14,7 @@
     userSection,
     btnPagar,
     historialSection,
-    historialContainer,
-    paginacionContainer;
+    historialContainer;
 
   // --- Funciones ---
 
@@ -41,20 +38,8 @@
    * @param {Array} [productosAMostrar=productos] - La lista de productos a renderizar.
    */
   function renderizarProductos(productosAMostrar = productos) {
-    productosContainer.innerHTML = "";
-
-    // Calcular los productos para la página actual
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const productosEnPagina = productosAMostrar.slice(startIndex, endIndex);
-
-    if (productosEnPagina.length === 0 && currentPage > 1) {
-      // Si estamos en una página vacía (p.ej. después de un filtro), volvemos a la primera
-      currentPage = 1;
-      renderizarProductos(productosAMostrar);
-      return;
-    }
-    productosEnPagina.forEach((producto) => {
+    productosContainer.innerHTML = ""; // Limpiar para re-renderizar
+    productosAMostrar.forEach((producto) => {
       const productoDiv = document.createElement("div");
       productoDiv.classList.add("producto");
       productoDiv.dataset.id = producto.id; // Identificador para la animación
@@ -83,48 +68,6 @@
 
       productosContainer.appendChild(productoDiv);
     });
-
-    renderizarPaginacion(productosAMostrar);
-  }
-
-  /**
-   * Renderiza los controles de paginación.
-   * @param {Array} productosAMostrar - La lista completa de productos para calcular las páginas.
-   */
-  function renderizarPaginacion(productosAMostrar) {
-    paginacionContainer.innerHTML = "";
-    const totalPages = Math.ceil(productosAMostrar.length / itemsPerPage);
-
-    if (totalPages <= 1) return; // No mostrar paginación si solo hay una página
-
-    // Botón "Anterior"
-    const btnPrev = document.createElement("button");
-    btnPrev.textContent = "Anterior";
-    btnPrev.className = "btn-pagina";
-    btnPrev.disabled = currentPage === 1;
-    btnPrev.addEventListener("click", () => {
-      if (currentPage > 1) {
-        currentPage--;
-        renderizarProductos(productosAMostrar);
-      }
-    });
-    paginacionContainer.appendChild(btnPrev);
-
-    // Botones de número de página (se puede simplificar si hay muchas páginas)
-    for (let i = 1; i <= totalPages; i++) {
-      const btnPage = document.createElement("button");
-      btnPage.textContent = i;
-      btnPage.className = "btn-pagina";
-      if (i === currentPage) {
-        btnPage.classList.add("active");
-      }
-      btnPage.addEventListener("click", () => {
-        currentPage = i;
-        renderizarProductos(productosAMostrar);
-      });
-      paginacionContainer.appendChild(btnPage);
-    }
-    // Aquí se podría añadir un botón "Siguiente" de forma similar
   }
 
   /**
@@ -619,7 +562,6 @@
     btnPagar = document.getElementById("btn-pagar");
     historialSection = document.getElementById("historial-compras");
     historialContainer = document.getElementById("historial-container");
-    paginacionContainer = document.getElementById("paginacion-container");
 
     await inicializarProductos();
     cargarCarritoDeStorage();
@@ -637,7 +579,6 @@
     });
 
     filtroBusquedaInput.addEventListener("input", (e) => {
-      currentPage = 1; // Resetear a la primera página al buscar
       const terminoBusqueda = e.target.value.toLowerCase();
       const productosFiltrados = productos.filter((producto) =>
         producto.nombre.toLowerCase().includes(terminoBusqueda)
