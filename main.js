@@ -25,6 +25,7 @@
     productosAMostrar.forEach((producto) => {
       const productoDiv = document.createElement("div");
       productoDiv.classList.add("producto");
+      productoDiv.dataset.id = producto.id; // Identificador para la animación
 
       if (producto.stock === 0) {
         productoDiv.classList.add("sin-stock");
@@ -50,6 +51,41 @@
 
       productosContainer.appendChild(productoDiv);
     });
+  }
+
+  /**
+   * Actualiza la vista de un único producto en el DOM sin recargar toda la lista.
+   * @param {number} productoId - El ID del producto a actualizar.
+   */
+  function actualizarVistaProducto(productoId) {
+    const producto = productos.find((p) => p.id === productoId);
+    if (!producto) return;
+
+    const productoDiv = productosContainer.querySelector(
+      `.producto[data-id="${productoId}"]`
+    );
+    if (!productoDiv) return;
+
+    // Actualizar el texto del stock
+    const infoSpan = productoDiv.querySelector(
+      ".producto-info span:first-child"
+    );
+    if (infoSpan) {
+      infoSpan.textContent = `${producto.nombre} (Stock: ${producto.stock})`;
+    }
+
+    // Actualizar el botón
+    const boton = productoDiv.querySelector(".btn-agregar");
+    if (boton) {
+      if (producto.stock > 0) {
+        boton.disabled = false;
+        boton.textContent = "Agregar";
+      } else {
+        boton.disabled = true;
+        boton.textContent = "Sin stock";
+        productoDiv.classList.add("sin-stock");
+      }
+    }
   }
 
   /**
@@ -85,9 +121,21 @@
       }
 
       guardarProductosEnStorage();
-      renderizarProductos(); // Re-renderizar productos para actualizar stock y botón
+      actualizarVistaProducto(productoId); // <-- OPTIMIZACIÓN: Solo actualizamos el producto afectado
       renderizarCarrito();
       guardarCarritoEnStorage();
+
+      // Aplicar animación de "flash" al producto agregado
+      const productoDiv = productosContainer.querySelector(
+        `.producto[data-id="${productoId}"]`
+      );
+      if (productoDiv) {
+        productoDiv.classList.add("producto-agregado-animacion");
+        // Quitar la clase después de que la animación termine para poder reutilizarla
+        setTimeout(() => {
+          productoDiv.classList.remove("producto-agregado-animacion");
+        }, 700); // 700ms, igual que la duración de la animación
+      }
     }
   }
 
@@ -149,7 +197,10 @@
       );
 
       // Actualizar todo
-      guardarYRenderizarTodo();
+      guardarProductosEnStorage();
+      guardarCarritoEnStorage();
+      actualizarVistaProducto(productoId); // <-- OPTIMIZACIÓN
+      renderizarCarrito();
     }
   }
 
@@ -313,6 +364,7 @@
 
         // Reiniciar el estado
         carrito = [];
+        guardarProductosEnStorage(); // Guardamos el nuevo stock de productos
         guardarCarritoEnStorage(); // Guardar el carrito vacío en storage
         renderizarCarrito();
 
@@ -380,16 +432,6 @@
         .addEventListener("click", iniciarSesion);
       btnPagar.disabled = true;
     }
-  }
-
-  /**
-   * Función de ayuda para guardar todos los estados y re-renderizar las vistas.
-   */
-  function guardarYRenderizarTodo() {
-    guardarProductosEnStorage();
-    guardarCarritoEnStorage();
-    renderizarProductos();
-    renderizarCarrito();
   }
 
   /**

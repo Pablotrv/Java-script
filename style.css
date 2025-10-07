@@ -187,3 +187,21 @@ button:disabled {
     width: 45%;
   }
 }
+
+/* --- Animación para agregar al carrito --- */
+@keyframes flash-producto {
+  0% {
+    background-color: #f8f9fa; /* Color de fondo inicial/hover */
+  }
+  50% {
+    background-color: #cce5ff; /* Color del destello (azul claro) */
+    transform: scale(1.01); /* Un ligero escalado para más impacto */
+  }
+  100% {
+    background-color: #f8f9fa; /* Vuelve al color inicial */
+  }
+}
+
+.producto-agregado-animacion {
+  animation: flash-producto 0.7s ease-out;
+}
