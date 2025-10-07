@@ -7,17 +7,17 @@
   let currentPage = 1;
   const itemsPerPage = 5; // Productos a mostrar por página
 
-  // --- Selectores del DOM ---
-  const productosContainer = document.getElementById("productos-container");
-  const carritoItemsContainer = document.getElementById("carrito-items");
-  const totalCompraSpan = document.getElementById("total-compra");
-  const btnVaciarCarrito = document.getElementById("btn-vaciar-carrito");
-  const filtroBusquedaInput = document.getElementById("filtro-busqueda");
-  const userSection = document.getElementById("user-section");
-  const btnPagar = document.getElementById("btn-pagar");
-  const historialSection = document.getElementById("historial-compras");
-  const historialContainer = document.getElementById("historial-container");
-  const paginacionContainer = document.getElementById("paginacion-container");
+  // --- Selectores del DOM (se inicializarán en inicializarApp) ---
+  let productosContainer,
+    carritoItemsContainer,
+    totalCompraSpan,
+    btnVaciarCarrito,
+    filtroBusquedaInput,
+    userSection,
+    btnPagar,
+    historialSection,
+    historialContainer,
+    paginacionContainer;
 
   // --- Funciones ---
 
@@ -609,12 +609,31 @@
 
   // --- Inicialización y Event Listeners ---
   async function inicializarApp() {
+    // Inicializar selectores del DOM aquí para asegurar que el DOM esté cargado
+    productosContainer = document.getElementById("productos-container");
+    carritoItemsContainer = document.getElementById("carrito-items");
+    totalCompraSpan = document.getElementById("total-compra");
+    btnVaciarCarrito = document.getElementById("btn-vaciar-carrito");
+    filtroBusquedaInput = document.getElementById("filtro-busqueda");
+    userSection = document.getElementById("user-section");
+    btnPagar = document.getElementById("btn-pagar");
+    historialSection = document.getElementById("historial-compras");
+    historialContainer = document.getElementById("historial-container");
+    paginacionContainer = document.getElementById("paginacion-container");
+
     await inicializarProductos();
     cargarCarritoDeStorage();
     cargarHistorialDeStorage();
     renderizarProductos();
     renderizarCarrito();
     actualizarUIUsuario(); // Estado inicial de UI de usuario
+
+    // Adjuntar event listeners después de inicializar los elementos
+    productosContainer.addEventListener("click", handleProductClick);
+    filtroBusquedaInput.addEventListener("input", handleSearch);
+    carritoItemsContainer.addEventListener("click", handleCartClick);
+    btnVaciarCarrito.addEventListener("click", vaciarCarrito);
+    btnPagar.addEventListener("click", finalizarCompra);
   }
 
   productosContainer.addEventListener("click", (e) => {
