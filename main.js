@@ -4,6 +4,8 @@
   let carrito = [];
   let historialCompras = [];
   let usuarioLogueado = null;
+  let cotizacionDolar = null; // Para almacenar la cotización
+  let monedaActual = "ARS"; // Moneda por defecto: 'ARS' o 'USD'
 
   // --- Selectores del DOM ---
   const productosContainer = document.getElementById("productos-container");
@@ -15,6 +17,8 @@
   const btnPagar = document.getElementById("btn-pagar");
   const historialSection = document.getElementById("historial-compras");
   const historialContainer = document.getElementById("historial-container");
+  const dolarInfoContainer = document.getElementById("dolar-info");
+  const monedaSwitch = document.getElementById("moneda-switch");
 
   // --- Funciones ---
 
@@ -31,6 +35,26 @@
         "Ha ocurrido un error inesperado. Por favor, intenta de nuevo.",
       "error"
     );
+  }
+
+  /**
+   * Formatea un precio a la moneda actual.
+   * @param {number} precio - El precio en USD (base).
+   * @returns {string} - El precio formateado con el símbolo de la moneda.
+   */
+  function formatearPrecio(precio) {
+    if (monedaActual === "ARS") {
+      if (cotizacionDolar) {
+        const precioEnPesos = precio * cotizacionDolar;
+        return `$${precioEnPesos.toFixed(2)}`;
+      } else {
+        // Si aún no se cargó la cotización
+        return "Calculando...";
+      }
+    } else {
+      // Moneda es USD
+      return `U$S ${precio.toFixed(2)}`;
+    }
   }
 
   /**
@@ -60,7 +84,7 @@
       <div class="producto-contenido">
         <div class="producto-info">
           <span>${producto.nombre} (Stock: ${producto.stock})</span>
-          <span>- $${producto.precio.toFixed(2)}</span>
+          <span>- ${formatearPrecio(producto.precio)}</span>
         </div>
         ${botonAgregar}
       </div>
@@ -169,7 +193,7 @@
     carritoItemsContainer.innerHTML = ""; // Limpiar el carrito antes de renderizar
     let totalCompra = 0;
 
-    if (carrito.length === 0) {
+    if (carrito.length === 0 || !cotizacionDolar) {
       btnVaciarCarrito.style.display = "none";
       carritoItemsContainer.innerHTML = "<li>El carrito está vacío.</li>";
     } else {
@@ -192,7 +216,9 @@
       });
     }
 
-    totalCompraSpan.textContent = totalCompra.toFixed(2);
+    totalCompraSpan.textContent = formatearPrecio(totalCompra)
+      .replace("U$S ", "")
+      .replace("$", "");
   }
 
   /**
@@ -420,11 +446,13 @@
 
     Swal.fire({
       title: "Confirmar Compra",
-      text: `El total es de $${totalCompraSpan.textContent}. ¿Deseas continuar?`,
       icon: "question",
       html: `
-        <p>El total es de <b>$${totalCompraSpan.textContent}</b>.</p>
+        <p>El total es de <b>${monedaActual === "ARS" ? "$" : "U$S "}${
+        totalCompraSpan.textContent
+      }</b>.</p>
         <select id="metodo-pago" class="swal2-select">
+          <option value="" disabled selected>Selecciona un método de pago</option>
           <option value="tarjeta">Tarjeta de Crédito/Débito</option>
           <option value="efectivo">Efectivo</option>
           <option value="mercadopago">MercadoPago</option>
@@ -436,7 +464,12 @@
       confirmButtonText: "Sí, pagar",
       cancelButtonText: "Cancelar",
       preConfirm: () => {
-        return document.getElementById("metodo-pago").value;
+        const metodo = document.getElementById("metodo-pago").value;
+        if (!metodo) {
+          Swal.showValidationMessage("Por favor, selecciona un método de pago");
+          return false;
+        }
+        return metodo;
       },
     }).then((result) => {
       if (result.isConfirmed && result.value) {
@@ -446,7 +479,10 @@
         const nuevaCompra = {
           fecha: new Date().toISOString(),
           items: [...carrito], // Copia del carrito
-          total: parseFloat(totalCompraSpan.textContent),
+          total:
+            monedaActual === "USD"
+              ? parseFloat(totalCompraSpan.textContent)
+              : parseFloat(totalCompraSpan.textContent) / cotizacionDolar,
           metodoPago: metodoPago,
         };
         historialCompras.push(nuevaCompra);
@@ -550,9 +586,41 @@
     });
   }
 
+  /**
+   * Obtiene la cotización del dólar blue en tiempo real y la muestra en el DOM.
+   */
+  async function obtenerCotizacionDolar() {
+    try {
+      const response = await fetch("https://dolarapi.com/v1/dolares/blue");
+      if (!response.ok) {
+        throw new Error("No se pudo obtener la cotización del dólar.");
+      }
+      const data = await response.json();
+
+      const { venta, fechaActualizacion } = data;
+      cotizacionDolar = venta; // Guardamos la cotización
+
+      const fechaFormateada = new Date(fechaActualizacion).toLocaleString(
+        "es-AR"
+      );
+
+      dolarInfoContainer.innerHTML = `
+        <strong>Dólar Blue:</strong> $${venta} (Venta) <br>
+        <small>Actualizado: ${fechaFormateada}</small>
+      `;
+      // Re-renderizar productos y carrito por si la moneda es ARS
+      renderizarProductos();
+      renderizarCarrito();
+    } catch (error) {
+      console.error("Error al obtener cotización:", error);
+      dolarInfoContainer.textContent = "No se pudo cargar la cotización.";
+    }
+  }
+
   // --- Inicialización y Event Listeners ---
   async function inicializarApp() {
     try {
+      await obtenerCotizacionDolar(); // Obtener la cotización al iniciar
       await inicializarProductos();
       cargarCarritoDeStorage();
       cargarHistorialDeStorage();
@@ -585,6 +653,13 @@
       btnVaciarCarrito.addEventListener("click", vaciarCarrito);
 
       btnPagar.addEventListener("click", finalizarCompra);
+
+      monedaSwitch.addEventListener("change", (e) => {
+        monedaActual = e.target.checked ? "USD" : "ARS";
+        // Re-renderizar todo para reflejar el cambio de moneda
+        renderizarProductos();
+        renderizarCarrito();
+      });
     } catch (error) {
       manejarError(error, "Ocurrió un error crítico al iniciar la aplicación.");
     }

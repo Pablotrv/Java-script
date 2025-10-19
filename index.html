@@ -24,12 +24,23 @@
       <div id="user-section">
         <button id="btn-login">Iniciar Sesión</button>
       </div>
+      <div id="dolar-info">Cargando cotización...</div>
       <h1>¡Bienvenido a la Tienda de Productos Gamer!</h1>
     </header>
 
     <main>
       <section id="tienda">
-        <h2>Nuestros Productos</h2>
+        <div class="tienda-header">
+          <h2>Nuestros Productos</h2>
+          <div class="moneda-switch-container">
+            <span>ARS</span>
+            <label class="switch">
+              <input type="checkbox" id="moneda-switch" />
+              <span class="slider round"></span>
+            </label>
+            <span>USD</span>
+          </div>
+        </div>
         <input
           type="text"
           id="filtro-busqueda"

@@ -21,6 +21,18 @@ header {
   background-color: #343a40; /* Color oscuro sólido */
 }
 
+#dolar-info {
+  font-size: 1em;
+  color: #495057;
+  background-color: #e9ecef;
+  padding: 8px 15px;
+  border-radius: 5px;
+  /* Nuevos estilos para centrarlo */
+  display: inline-block;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
 main {
   display: flex;
   flex-direction: column;
@@ -36,6 +48,13 @@ main {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
+}
+
+.tienda-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 #filtro-busqueda {
@@ -247,4 +266,58 @@ button:disabled {
 
 .compra-historial ul {
   padding-left: 20px;
+}
+
+/* --- Estilos para el Switch de Moneda --- */
+.moneda-switch-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  color: #495057;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px; /* Ancho reducido */
+  height: 28px; /* Alto reducido */
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 28px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px; /* Círculo interior reducido */
+  width: 20px; /* Círculo interior reducido */
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #007bff;
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px); /* Desplazamiento reducido */
 }
