@@ -165,7 +165,6 @@ button {
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.2s, transform 0.1s;
-  font-weight: bold;
 }
 
 button:hover {
@@ -251,16 +250,11 @@ button:hover {
   font-size: 1.1em;
   margin-top: 15px;
   background-color: #28a745;
+  font-weight: bold;
 }
 
 #btn-pagar:hover {
   background-color: #218838;
-}
-
-#btn-pagar:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-  transform: none;
 }
 
 /* --- Media Queries para Diseño Responsivo (Desktop) --- */
