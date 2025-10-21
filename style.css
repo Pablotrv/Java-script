@@ -180,10 +180,12 @@ button:hover {
   background-color: #0056b3;
 }
 
-button:disabled {
+.btn-agregar:disabled,
+#btn-pagar:disabled {
   background-color: #6c757d;
   cursor: not-allowed;
   transform: none;
+  opacity: 0.7;
 }
 
 #carrito-acciones {
