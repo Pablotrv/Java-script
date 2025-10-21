@@ -349,7 +349,7 @@ button:disabled {
   height: 28px; /* Alto reducido */
 }
 
-.switch input {
+.switch > input {
   opacity: 0;
   width: 0;
   height: 0;
