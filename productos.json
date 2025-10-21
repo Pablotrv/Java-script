@@ -4,14 +4,14 @@
     "nombre": "Laptop Gamer Asus ROG",
     "precio": 1500,
     "stock": 5,
-    "imagen": "images/laptop.jpg"
+    "imagen": "images/laptopAsus.jpg"
   },
   {
     "id": 2,
     "nombre": "Mouse Óptico Logitech G502",
     "precio": 25,
     "stock": 20,
-    "imagen": "images/mouse.jpg"
+    "imagen": "images/Mouse Optico Logitech G502.jpg"
   },
   {
     "id": 3,

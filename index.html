@@ -24,7 +24,17 @@
       <div id="user-section">
         <button id="btn-login">Iniciar Sesión</button>
       </div>
-      <div id="dolar-info">Cargando cotización...</div>
+      <div class="header-controls">
+        <div id="dolar-info">Cargando cotización...</div>
+        <div class="theme-switch-container">
+          <span>☀️</span>
+          <label class="switch">
+            <input type="checkbox" id="theme-switch" />
+            <span class="slider round"></span>
+          </label>
+          <span>🌙</span>
+        </div>
+      </div>
       <h1>¡Bienvenido a la Tienda de Productos Gamer!</h1>
     </header>
 
@@ -58,7 +68,7 @@
           </button>
         </div>
         <div id="total-container">
-          Total: $<span id="total-compra">0.00</span>
+          Total: <span id="total-compra">0.00</span>
         </div>
         <button id="btn-pagar">Finalizar Compra</button>
       </section>
