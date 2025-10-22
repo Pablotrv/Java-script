@@ -63,6 +63,7 @@ function formatearPrecio(precio) {
  */
 function renderizarProductos(productosAMostrar = productos) {
   productosContainer.innerHTML = ""; // Limpiar para re-renderizar
+
   productosAMostrar.forEach((producto) => {
     const productoDiv = document.createElement("div");
     productoDiv.classList.add("producto");
@@ -359,7 +360,7 @@ async function inicializarProductos() {
       }
       productos = await response.json();
       guardarProductosEnStorage(); // Guardamos la lista inicial en storage
-      console.log("Productos cargados desde productos.json.");
+      console.log("Productos cargados desde productos.json." + productos);
     }
   } catch (error) {
     productos = []; // Dejar la lista vacía si todo falla

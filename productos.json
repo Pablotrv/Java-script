@@ -4,76 +4,76 @@
     "nombre": "Laptop Gamer Asus ROG",
     "precio": 1500,
     "stock": 5,
-    "imagen": "images/laptopAsus.jpg"
+    "imagen": "/images/laptopAsus.jpg"
   },
   {
     "id": 2,
     "nombre": "Mouse Óptico Logitech G502",
     "precio": 25,
     "stock": 20,
-    "imagen": "images/Mouse Optico Logitech G502.jpg"
+    "imagen": "/images/MouseOpticoLogitechG502.jpg"
   },
   {
     "id": 3,
     "nombre": "Teclado Mecánico Corsair K95",
     "precio": 120,
     "stock": 10,
-    "imagen": "images/teclado.jpg"
+    "imagen": "/images/TecladoMecAnicoCorsairK95.jpg"
   },
   {
     "id": 4,
     "nombre": "Monitor 27\" Dell",
     "precio": 350,
     "stock": 8,
-    "imagen": "images/monitor.jpg"
+    "imagen": "/images/Monitor27Dell.jpg"
   },
   {
     "id": 5,
     "nombre": "Placa de Video TUF Gaming 3090",
     "precio": 1300,
     "stock": 3,
-    "imagen": "images/gpu.jpg"
+    "imagen": "/images/PlacadeVideoTUFGaming3090.jpg"
   },
   {
     "id": 6,
     "nombre": "Auriculares Corsair Void Elite",
     "precio": 300,
     "stock": 12,
-    "imagen": "images/auriculares.jpg"
+    "imagen": "./images/AuricularesCorsairVoidElite.jpg"
   },
   {
     "id": 7,
     "nombre": "Mouse Gamer Corsair Harpoon",
     "precio": 300,
     "stock": 15,
-    "imagen": "images/mouse.jpg"
+    "imagen": "/images/MouseGamerCorsairHarpoon.jpg"
   },
   {
     "id": 8,
     "nombre": "Disco Sólido SSD 1TB Lexar",
     "precio": 200,
     "stock": 18,
-    "imagen": "images/ssd.jpg"
+    "imagen": "/images/DiscoSólidoSSD1TBLexar.jpg"
   },
   {
     "id": 9,
     "nombre": "Memoria RAM 16GB DDR5",
     "precio": 80,
     "stock": 25,
-    "imagen": "images/ram.jpg"
+    "imagen": "/images/MemoriaRAM16GBDDR5.jpg"
   },
   {
     "id": 10,
     "nombre": "Fuente de Poder ROG Strix 1000W",
     "precio": 100,
     "stock": 7,
-    "imagen": "images/psu.jpg"
+    "imagen": "/images/FuentedePoderROGStrix1000W.jpg"
   },
   {
     "id": 11,
     "nombre": "Gabinete NZXT H510",
     "precio": 90,
     "stock": 9,
-    "imagen": "images/gabinete.jpg"
+    "imagen": "/images/GabineteNZXTH510.jpg"
   }
 ]
