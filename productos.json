@@ -4,7 +4,7 @@
     "nombre": "Laptop Gamer Asus ROG",
     "precio": 1500,
     "stock": 5,
-    "imagen": "/images/laptopAsus.jpg"
+    "imagen": "./images/laptopAsus.jpg"
   },
   {
     "id": 2,
@@ -18,14 +18,14 @@
     "nombre": "Teclado Mecánico Corsair K95",
     "precio": 120,
     "stock": 10,
-    "imagen": "../images/TecladoMecAnicoCorsairK95.jpg"
+    "imagen": "../../images/TecladoMecAnicoCorsairK95.jpg"
   },
   {
     "id": 4,
     "nombre": "Monitor 27\" Dell",
     "precio": 350,
     "stock": 8,
-    "imagen": "../images/Monitor27Dell.jpg"
+    "imagen": "images/Monitor27Dell.jpg"
   },
   {
     "id": 5,
@@ -39,7 +39,7 @@
     "nombre": "Auriculares Corsair Void Elite",
     "precio": 300,
     "stock": 12,
-    "imagen": "../images/AuricularesCorsairVoidElite.jpg"
+    "imagen": "../../images/AuricularesCorsairVoidElite.jpg"
   },
   {
     "id": 7,
